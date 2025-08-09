@@ -1,0 +1,93 @@
+### library ####
+library(EffectLiteR)
+library(restriktor)
+library(bain)
+library(tidyverse)
+
+source("Data Generation.R")
+source("EDR_function.R")
+source("goric_preference function.R")
+source("bain_preference function.R")
+source("p_value_decision function.R")
+#------------------------------------------------------------------------------------------------------------------------
+
+
+start_simulation <- function (repetitions=5, N, true_hypothesis=0, conditions, hypothesis, p_threshold=0.05){
+  
+results <- array(0, dim = c(repetitions, length(N), length(conditions)),
+                 dimnames = list(NULL, as.character(N), conditions))
+# A 3d Array with [dim 1: repitition number, dim 2: N, dim 3: condition]
+
+
+for (n in N) {
+  for (r in 1:repetitions){
+    data <- generateData(N=n, hypothesis=true_hypothesis)
+    
+    ## NHST in ELR
+    elrmod <- effectLite(
+      data = data,
+      y = "y",
+      x = "x",
+      k = "k",
+      z = "z",
+      method = "sem",
+      mimic="lm",             # since we use sem but mimic lm, we need to change other arguments default setting according to lm function
+      fixed.cell=TRUE,        # Mit sem Methode wäre FALSE default
+      fixed.z=TRUE,           # Mit sem Methode wäre FALSE deafult
+      homoscedasticity=TRUE,  # Mit sem Methode wäre FALSE deafult
+      test.stat = "Wald"
+    )
+    
+    p_nhst <- p_value_decision(p_value = elrmod@results@hypotheses[1,"p-value"],
+                               true_hypothesis = true_hypothesis,
+                               threshold = p_threshold)
+    
+    ## IHT in ELR
+    p_iht <- p_value_decision(p_value = effectLite_iht(constraints = hypothesis, test = "Wald", object = elrmod)$pvalue,
+                              true_hypothesis = true_hypothesis,
+                              threshold = p_threshold)
+    
+    
+    ## GORIC(A)
+    parnames <- c("adjmean0","adjmean1","adjmean2")
+    est_AdjMeans <- elrmod@results@est[parnames]
+    VCOV_AdjMeans <- elrmod@results@vcov.def[parnames,parnames]
+    gorica_AdjMeans <- goric(est_AdjMeans, VCOV=VCOV_AdjMeans, hypotheses=list(H1=hypothesis))
+    
+    goric_decision <- goric_preference(gorica_AdjMeans, true_hypothesis) # EDR with maximum goric weight
+
+    
+    ## bain
+    
+    bain_AdjMeans <- bain(x = est_AdjMeans,
+                 hypothesis = hypothesis,
+                 n = n,
+                 Sigma = list(VCOV_AdjMeans),
+                 group_parameters = 3, # each group is described by 3 parameters: x,k,z
+                 joint_parameters = 0) # number of shared parameters in "estimates" is 0
+    
+    bain_decision <- bain_preference(bain_AdjMeans, true_hypothesis)
+    )
+    
+    ## results: 0 is correct decision, 1 is an erroneous decision
+    results[r, as.character(n), "iht"] <- p_iht
+    results[r, as.character(n), "nhst"] <- p_nhst
+    results[r, as.character(n), "goric"] <- goric_decision
+    results[r, as.character(n), "bain"] <- bain_decision
+  }
+}
+
+return(empirical_detection_rate(results))
+}
+
+# type I error rate
+# 100 reps
+#        50  100
+#nhst  0.05 0.05
+#iht   0.11 0.04
+#goric 0.20 0.24
+
+# warning for 100 reps:
+#lavaan->lav_samplestats_icov():  
+#  sample covariance matrix in group: 4 is not positive-definite
+
