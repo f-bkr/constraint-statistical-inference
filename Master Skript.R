@@ -13,7 +13,7 @@ source("p_value_decision function.R")
 #------------------------------------------------------------------------------------------------------------------------
 
 
-start_simulation <- function (repetitions=5, N, true_hypothesis=0, conditions, hypothesis, p_threshold=0.05){
+start_simulation <- function (repetitions=5, N, true_hypothesis=0, conditions, hypothesis, p_threshold=0.05, small.effect=0){
   
 results <- array(0, dim = c(repetitions, length(N), length(conditions)),
                  dimnames = list(NULL, as.character(N), conditions))
@@ -22,7 +22,7 @@ results <- array(0, dim = c(repetitions, length(N), length(conditions)),
 
 for (n in N) {
   for (r in 1:repetitions){
-    data <- generateData(N=n, hypothesis=true_hypothesis)
+    data <- generateData(N=n, hypothesis=true_hypothesis, small.effect=small.effect)
     
     ## NHST in ELR
     elrmod <- effectLite(

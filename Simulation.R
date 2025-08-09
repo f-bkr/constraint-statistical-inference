@@ -2,7 +2,7 @@ source("Master Skript.R")
 
 set.seed(313)
 test <- start_simulation(repetitions=2, N=c(100, 200), true_hypothesis=0, conditions = c("nhst", "iht", "goric", "bain"),
-                         hypothesis = "adjmean0 < adjmean1; adjmean1 < adjmean2", p_threshold = 0.05)
+                         hypothesis = "adjmean0 < adjmean1; adjmean1 < adjmean2", p_threshold = 0.05, small.effect=0)
 
 
 ### test simulation
