@@ -7,6 +7,7 @@ library(tidyverse)
 source("Data Generation.R")
 source("EDR_function.R")
 source("goric_preference function.R")
+source("bain_function.R")
 source("bain_preference function.R")
 source("p_value_decision function.R")
 #------------------------------------------------------------------------------------------------------------------------
@@ -59,15 +60,10 @@ for (n in N) {
     
     ## bain
     
-    bain_AdjMeans <- bain(x = est_AdjMeans,
-                 hypothesis = hypothesis,
-                 n = n,
-                 Sigma = list(VCOV_AdjMeans),
-                 group_parameters = 3, # each group is described by 3 parameters: x,k,z
-                 joint_parameters = 0) # number of shared parameters in "estimates" is 0
+    bain_AdjMeans <- bain_function(est_AdjMeans = est_AdjMeans, VCOV_AdjMeans=VCOV_AdjMeans, hypothesis = hypothesis, true_hypothesis=true_hypothesis, n = n)
     
     bain_decision <- bain_preference(bain_AdjMeans, true_hypothesis)
-    )
+    
     
     ## results: 0 is correct decision, 1 is an erroneous decision
     results[r, as.character(n), "iht"] <- p_iht
