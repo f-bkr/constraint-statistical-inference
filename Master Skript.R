@@ -5,6 +5,7 @@ library(bain)
 library(tidyverse)
 
 source("Data Generation.R")
+source("elr_function.R")
 source("EDR_function.R")
 source("goric_preference function.R")
 source("bain_function.R")
@@ -25,7 +26,7 @@ for (n in N) {
     data <- generateData(N=n, hypothesis=true_hypothesis, small.effect=small.effect0)
     
     ## NHST in ELR
-    elr_function(data=data)
+    elrmod <- elr_function(data=data)
     
     p_nhst <- p_value_decision(p_value = elrmod@results@hypotheses[1,"p-value"],
                                true_hypothesis = true_hypothesis,
