@@ -22,22 +22,10 @@ results <- array(0, dim = c(repetitions, length(N), length(conditions)),
 
 for (n in N) {
   for (r in 1:repetitions){
-    data <- generateData(N=n, hypothesis=true_hypothesis, small.effect=small.effect)
+    data <- generateData(N=n, hypothesis=true_hypothesis, small.effect=small.effect0)
     
     ## NHST in ELR
-    elrmod <- effectLite(
-      data = data,
-      y = "y",
-      x = "x",
-      k = "k",
-      z = "z",
-      method = "sem",
-      mimic="lm",             # since we use sem but mimic lm, we need to change other arguments default setting according to lm function
-      fixed.cell=TRUE,        # Mit sem Methode wäre FALSE default
-      fixed.z=TRUE,           # Mit sem Methode wäre FALSE deafult
-      homoscedasticity=TRUE,  # Mit sem Methode wäre FALSE deafult
-      test.stat = "Wald"
-    )
+    elr_function(data=data)
     
     p_nhst <- p_value_decision(p_value = elrmod@results@hypotheses[1,"p-value"],
                                true_hypothesis = true_hypothesis,
