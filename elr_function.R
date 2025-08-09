@@ -17,6 +17,7 @@ elr_function <- function(data=data){
     homoscedasticity=TRUE,  # Mit sem Methode wäre FALSE deafult
     test.stat = "Wald"
                     )
+  return(elrmod)
     },
   #if error occurs:
     error=function(e){
