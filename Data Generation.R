@@ -13,21 +13,14 @@ generateData <- function(N, hypothesis=0, small.effect=0){
   
   # Define design grid: 2 levels of k, 3 levels of x
   design <- expand.grid(k = 0:1, x = 0:2)
+  num_cells <- nrow(design)
   
-  # Define probability vector for sampling design combinations
-  probability_vector <- c(1/6, 1/6, 1/6, 1/6, 1/6, 1/6)
-  # Below is unbalanced Design:
-  # probability_vector <- c(0.1, 0.2, 0.1, 0.1, 0.3, 0.2)
+  # Equal individuals per cell
+  n_per_cell <- N / num_cells
+  if (n_per_cell != floor(n_per_cell)) stop("N must be divisible by number of cells.")
   
-  ## Ensure minimum cell allocation to avoid empty cells
-  num_cells <- nrow(design) # number of cells
-  # 1 individuum per cell
-  base_inds <- 1:num_cells # a vector of row indices: 1 2 3 4 5 6
-  # sample the remaining individuals
-  remaining_N <- N - num_cells
-  remaining_inds <- sample(1:num_cells, size = remaining_N, replace = TRUE, prob = probability_vector)
-  # combine
-  ind <- c(base_inds, remaining_inds)
+  # Create balanced sample
+  ind <- rep(1:num_cells, each = n_per_cell)
   
   
   # Assign rows of design to sampled individuals

@@ -23,6 +23,8 @@ results <- array(0, dim = c(repetitions, length(N), length(conditions)),
 
 for (n in N) {
   for (r in 1:repetitions){
+    print(r) #to know status of simulation process
+    
     data <- generateData(N=n, hypothesis=true_hypothesis, small.effect=small.effect0)
     
     ## NHST in ELR
@@ -53,6 +55,13 @@ for (n in N) {
     
     bain_decision <- bain_preference(bain_AdjMeans, true_hypothesis)
     
+    
+    # to catch random "Fehler in results[r, as.character(n), "bain"] <- bain_decision : 
+    #Ersetzung hat Länge 0" error
+    
+    if (length(bain_decision) == 0 || is.na(bain_decision)) {
+      bain_decision <- NA  # or 1 if you want to treat invalid as error
+    }
     
     ## results: 0 is correct decision, 1 is an erroneous decision
     results[r, as.character(n), "iht"] <- p_iht

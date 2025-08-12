@@ -1,21 +1,36 @@
 # This is the function for the bain function
 
-bain_function <- function(est_AdjMeans, hypothesis,n,VCOV_AdjMeans, true_hypothesis) {
+bain_function <- function(est_AdjMeans, hypothesis, n, VCOV_AdjMeans, true_hypothesis) {
   tryCatch(
-    # try this
     {
-  bain_AdjMeans <- bain(x = est_AdjMeans,
-                      hypothesis = hypothesis,
-                      n = n,
-                      Sigma = list(VCOV_AdjMeans),
-                      group_parameters = 3, # each group is described by 3 parameters: x,k,z
-                      joint_parameters = 0) # number of shared parameters in "estimates" is 0
-    return(bain_AdjMeans)
+      
+      message("Running bain with:")
+      message("est_AdjMeans: ", paste(round(est_AdjMeans, 4), collapse = ", "))
+      message("hypothesis: ", hypothesis)
+      message("n: ", n)
+      message("VCOV_AdjMeans: ", paste(round(as.vector(VCOV_AdjMeans), 4), collapse = ", "))
+      
+      bain_AdjMeans <- bain(
+        x = est_AdjMeans,
+        hypothesis = hypothesis,
+        n = n,
+        Sigma = list(VCOV_AdjMeans),
+        group_parameters = 3,
+        joint_parameters = 0
+      )
+      
+      return(bain_AdjMeans)
     },
-    #if error occurs:
-    error=function(e){
-      print(e)
+    error = function(e) {
+      message("Bain error: ", e$message)
+      message("---- Debug info ----")
+      message("est_AdjMeans: ", paste(round(est_AdjMeans, 4), collapse = ", "))
+      message("hypothesis: ", hypothesis)
+      message("n: ", n)
+      message("VCOV_AdjMeans: ", paste(round(as.vector(VCOV_AdjMeans), 4), collapse = ", "))
+      
+      return(NA)  # Still return NULL so bain_preference() sees invalid case
     }
   )
-
 }
+

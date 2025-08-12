@@ -9,10 +9,10 @@ source("EDR_function.R")
 source("goric_preference function.R")
 #----------------------------------------------------------------------------
 
-data <- generateData(N=100, hypothesis=0)
+data <- generateData(N=24, hypothesis=1, small.effect = 0)
 
 elrmod <- effectLite(
-  data = tets,
+  data = data,
   y = "y",
   x = "x",
   k = "k",
@@ -26,23 +26,30 @@ elrmod <- effectLite(
 )
 
 
+
 parnames <- c("adjmean0","adjmean1","adjmean2")
 est_AdjMeans <- elrmod@results@est[parnames]
 VCOV_AdjMeans <- elrmod@results@vcov.def[parnames,parnames]
 hypothesis = "adjmean0 <  adjmean1; adjmean1 < adjmean2"
 
+
 test <- bain(x = est_AdjMeans,
      hypothesis = hypothesis,
-     n = 100,
+     n = 24,
      Sigma = list(VCOV_AdjMeans),
      group_parameters = 3, joint_parameters = 0)
 
 test
-test$fit$PMPc
+
+bain_function(est_AdjMeans = est_AdjMeans, n=24, hypothesis = hypothesis, VCOV_AdjMeans = VCOV_AdjMeans)
+
+bain_preference(test, true_hypothesis = 1, cutoff = "unusual")
+bain_preference_old(test, true_hypothesis = 1)
 
 
-bain_decision <-  #is 1 if Ha is preferred, is 0 if H0 is preferred
-
+test_g <- goric(est_AdjMeans, VCOV=VCOV_AdjMeans, hypotheses=list(H1=hypothesis))
+selected <- which.max(test_g$result$gorica.weights)
+selected
   
   
 t <- goric(est_AdjMeans, VCOV=VCOV_AdjMeans, hypotheses=list(H1=hypothesis))
@@ -60,6 +67,20 @@ p <- p_value_decision(p_value=effectLite_iht(constraints = "adjmean0 < adjmean1;
 t
 p
 
+
+
+
+
+p_nhst <- p_value_decision(p_value = elrmod@results@hypotheses[1, "p-value"],
+                           true_hypothesis = 0,
+                           threshold = 0.05)
+
+
+a <- (c(
+  p_nhst = p_nhst))
+a
+
+mean(a[, "p_nhst"]  == 1, na.rm = TRUE)
 
 
 #-----------------------------------------------------------------------------
