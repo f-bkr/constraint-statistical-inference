@@ -1,6 +1,6 @@
 # This is the function for the bain function
 
-bain_function <- function(est_AdjMeans, hypothesis, n, VCOV_AdjMeans, true_hypothesis) {
+bain_function <- function(est_AdjMeans, hypothesis, n, VCOV_AdjMeans) {
   tryCatch(
     {
       
