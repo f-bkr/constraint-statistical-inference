@@ -2,8 +2,15 @@
 # simdesign: Simulation study
 ###-----------------------------------------------------------------------------
 library(SimDesign)
-source("Master Skript.R")
 
+source("Master Skript.R")
+source("Data Generation.R")
+source("elr_function.R")
+source("EDR_function.R")
+source("goric_preference function.R")
+source("bain_function.R")
+source("bain_preference function.R")
+source("p_value_decision function.R")
 
 ###-----------------------------------------------------------------------------
 # Design
@@ -50,10 +57,20 @@ Analyse <- function(condition, dat, fixed_objects) {
                             cutoff = condition$cutoff)
   
   
-  # You can add more analyses here, returning a named vector:
+  ## GORIC(A)
+  parnames <- c("adjmean0","adjmean1","adjmean2")
+  est_AdjMeans <- elrmod@results@est[parnames]
+  VCOV_AdjMeans <- elrmod@results@vcov.def[parnames,parnames]
+  gorica_AdjMeans <- goric(est_AdjMeans, VCOV=VCOV_AdjMeans, hypotheses=list(H1=condition$hypothesis))
+  
+  goric_decision <- goric_preference(gorica_AdjMeans, condition$true_hypothesis)
+  
+  
+  #returning a named vector:
   return(c(
     p_nhst = p_nhst,
-    p_iht = p_iht))
+    p_iht = p_iht,
+    goric_iht = goric_decision))
 }
 
 
@@ -64,10 +81,12 @@ Summarise <- function(condition, results, fixed_objects) {
   
   edr_nhst  <- mean(results[, "p_nhst"]  == 1, na.rm = TRUE)
   edr_iht  <- mean(results[, "p_iht"]  == 1, na.rm = TRUE)
+  edr_goric  <- mean(results[, "goric_iht"]  == 1, na.rm = TRUE)
   
   return(c(
     EDR_NHST = edr_nhst,
-    EDR_IHT = edr_iht))
+    EDR_IHT = edr_iht,
+    EDR_GORIC = edr_goric))
 }
 
 
