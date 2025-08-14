@@ -43,13 +43,15 @@ generateData <- function(N, hypothesis=0, small.effect=0){
         y <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N,0,0.7)
       }
       if (small.effect==1){
-        z <- 1 + 0.5*k + 0.3*Ix1 + 0.4*Ix2 + rnorm(N,0,2)
-        b0 <- (0.1+0.8*z)
-        # z and b0 affect all groups equal, no need to change
-        b1 <- 0.15 + 0.3*k + 0.1*z   # smaller mean
-        b2 <- 0.3 + 0.5*k + 0.2*z + 0.4*k*z  # keep bigger
+        z  <- 1 + 0.20*k + 0.10*Ix1 + 0.12*Ix2 + rnorm(N, 0, 2.5)
         
-        y <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N, 0, 1)  # more noise than before
+        ## reduced coefficients
+        b0 <- 0.10 + 0.30*z
+        b1 <- 0.08 + 0.15*k + 0.08*z
+        b2 <- 0.10 + 0.18*k + 0.08*z + 0.08*k*z  # weak interaction
+        
+        ## outcome (more residual noise to shrink d)
+        y  <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N, 0, 1.6)
         
       }
     }
