@@ -12,7 +12,7 @@ Design <- createDesign(
   N = c(24, 60, 120, 240, 480),
   true_hypothesis = c(0, 1),
   small.effect = c(0, 1),
-  threshold = c("regular", "unusual"),
+  cutoff = c("regular", "unusual"),
   hypothesis = "adjmean0 < adjmean1; adjmean1 < adjmean2"
 )
 
@@ -39,7 +39,7 @@ Analyse <- function(condition, dat, fixed_objects) {
   elrmod <- elr_function(data = dat)
   p_nhst <- p_value_decision(p_value = elrmod@results@hypotheses[1, "p-value"],
                              true_hypothesis = condition$true_hypothesis,
-                             threshold = condition$threshold)
+                             cutoff = condition$cutoff)
   
   ## IHT in ELR
   p_iht <- p_value_decision(p_value = effectLite_iht(
@@ -47,7 +47,7 @@ Analyse <- function(condition, dat, fixed_objects) {
                             test = "Wald", 
                             object = elrmod)$pvalue,
                             true_hypothesis = condition$true_hypothesis,
-                            threshold = condition$threshold)
+                            cutoff = condition$cutoff)
   
   
   # You can add more analyses here, returning a named vector:
