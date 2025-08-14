@@ -82,6 +82,32 @@ a
 
 mean(a[, "p_nhst"]  == 1, na.rm = TRUE)
 
+#------------------------------------------------------------------------------
+# effect sizes
+
+dat <- generateData(N=9999996, hypothesis = 1, small.effect = 0)
+dat_small <- generateData(N=9999996, hypothesis = 1, small.effect = 1)
+
+dat_x0 <- dat[dat$x == 0, ]
+dat_x1 <- dat[dat$x == 1, ]
+dat_x2 <- dat[dat$x == 2, ]
+
+cohen.d(dat_x2$y, dat_x0$y)
+#d estimate: 0.6956135 (medium)
+
+cohen.d(dat_x1$y, dat_x0$y)
+#d estimate: 0.5547329 (medium)
+
+
+dat_small_x0 <- dat_small[dat_small$x==0, ]
+dat_small_x1 <- dat_small[dat_small$x==1, ]
+dat_small_x2 <- dat_small[dat_small$x==2, ]
+
+cohen.d(dat_small_x2$y, dat_small_x0$y)
+#d estimate: 0.6658335 (medium)
+
+cohen.d(dat_small_x1$y, dat_small_x0$y)
+#d estimate: 0.348134 (small)
 
 #-----------------------------------------------------------------------------
 # aus mayer 2016 supplements:
