@@ -61,16 +61,28 @@ Analyse <- function(condition, dat, fixed_objects) {
   parnames <- c("adjmean0","adjmean1","adjmean2")
   est_AdjMeans <- elrmod@results@est[parnames]
   VCOV_AdjMeans <- elrmod@results@vcov.def[parnames,parnames]
-  gorica_AdjMeans <- goric(est_AdjMeans, VCOV=VCOV_AdjMeans, hypotheses=list(H1=condition$hypothesis))
+  gorica_AdjMeans <- goric(est_AdjMeans, 
+                           VCOV=VCOV_AdjMeans, 
+                           hypotheses=list(H1=condition$hypothesis))
   
   goric_decision <- goric_preference(gorica_AdjMeans, condition$true_hypothesis)
+  
+  
+  ## bain
+  bain_AdjMeans <- bain_function(est_AdjMeans = est_AdjMeans, 
+                                 VCOV_AdjMeans=VCOV_AdjMeans, 
+                                 hypothesis = condition$hypothesis, 
+                                 n = condition$N)
+  
+  bain_decision <- bain_preference(bain_AdjMeans, condition$true_hypothesis)
   
   
   #returning a named vector:
   return(c(
     p_nhst = p_nhst,
     p_iht = p_iht,
-    goric_iht = goric_decision))
+    goric_iht = goric_decision,
+    bain_iht = bain_decision))
 }
 
 
@@ -82,11 +94,13 @@ Summarise <- function(condition, results, fixed_objects) {
   edr_nhst  <- mean(results[, "p_nhst"]  == 1, na.rm = TRUE)
   edr_iht  <- mean(results[, "p_iht"]  == 1, na.rm = TRUE)
   edr_goric  <- mean(results[, "goric_iht"]  == 1, na.rm = TRUE)
+  edr_bain  <- mean(results[, "bain_iht"]  == 1, na.rm = TRUE)
   
   return(c(
     EDR_NHST = edr_nhst,
     EDR_IHT = edr_iht,
-    EDR_GORIC = edr_goric))
+    EDR_GORIC = edr_goric,
+    EDR_BAIN = edr_bain))
 }
 
 
