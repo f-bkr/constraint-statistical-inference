@@ -1,10 +1,11 @@
 bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
   # catch some errors I encountered with bain objects
-  if (is.null(bain_obj) || is.null(bain_obj$fit) || length(bain_obj$fit$PMPc) == 0) {
-    message("Warning: bain_obj is invalid, returning NA")
-    print(bain_obj)
-    return(as.numeric(NA))
-  }
+  
+  #if (is.null(bain_obj) || is.null(bain_obj$fit) || length(bain_obj$fit$PMPc) == 0) {
+  #  message("Warning: bain_obj is invalid, returning NA")
+  #  print(bain_obj)
+  #  return(as.numeric(NA))
+  #}
   
 ################################################################################
 # General settings
@@ -69,7 +70,7 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
     # select based on cutoff value
     combined_pmp <- sum(pmpc[true_index], na.rm=TRUE) #bain splits hypothesis
     if (combined_pmp >= threshold) {
-      selected <- which.max(combined_pmp)
+      selected <- which.max(pmpc) #select after passing the threshold
     } else {
       selected <- NA
     }
@@ -118,5 +119,3 @@ bain_preference_old <- function(bain_obj, true_hypothesis){
   
   
 }
-
-## add an ic.cutoff argument
