@@ -9,7 +9,7 @@ source("EDR_function.R")
 source("goric_preference function.R")
 #----------------------------------------------------------------------------
 
-data <- generateData(N=24, hypothesis=1, small.effect = 0)
+data <- generateData(N=600, hypothesis=1, small.effect = 0)
 
 elrmod <- effectLite(
   data = data,
@@ -31,6 +31,11 @@ parnames <- c("adjmean0","adjmean1","adjmean2")
 est_AdjMeans <- elrmod@results@est[parnames]
 VCOV_AdjMeans <- elrmod@results@vcov.def[parnames,parnames]
 hypothesis = "adjmean0 <  adjmean1; adjmean1 < adjmean2"
+hypothesis2 = "adjmean0 < adjmean1 < adjmean2"
+
+effectLite_iht(constraints = "adjmean0 < adjmean1 < adjmean2",
+               test=,
+               object=elrmod)
 
 
 test <- bain(x = est_AdjMeans,
@@ -53,7 +58,7 @@ selected
   
   
 t <- goric(est_AdjMeans, VCOV=VCOV_AdjMeans, hypotheses=list(H1=hypothesis))
-t <- effectLite_iht(constraints = "adjmean0 < adjmean1; adjmean1 < adjmean2",
+t <- effectLite_iht(constraints = "adjmean0 adjmean1 < adjmean2",
                     test="Wald",
                     object=elrmod)
 

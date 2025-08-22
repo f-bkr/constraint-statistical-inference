@@ -16,7 +16,7 @@ source("p_value_decision function.R")
 # Design
 ###-----------------------------------------------------------------------------
 Design <- createDesign(
-  N = c(24, 60, 120, 240, 480),
+  N = c(24, 60, 120, 240, 480, 960),
   true_hypothesis = c(0, 1),
   small.effect = c(0, 1),
   cutoff = c("regular", "unusual"),
@@ -108,9 +108,9 @@ Summarise <- function(condition, results, fixed_objects) {
 # Simulation
 ###-----------------------------------------------------------------------------
 res <- runSimulation(design = Design,
-                     replications = 5,
+                     replications = 1000,
                      generate = Generate,
                      analyse = Analyse,
                      summarise = Summarise)
 
-write.csv(res, "Test_1_res")
+write.csv(res, "Simulation_1")
