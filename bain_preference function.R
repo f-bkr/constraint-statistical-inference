@@ -10,7 +10,7 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 ################################################################################
 # General settings
 ################################################################################
-  threshold <- 0.75
+  threshold <- 0.95
   
   # get all PMPc´s of all hypotheses
   pmpc <- as.numeric(bain_obj$fit$PMPc)

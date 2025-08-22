@@ -111,6 +111,7 @@ res <- runSimulation(design = Design,
                      replications = 1000,
                      generate = Generate,
                      analyse = Analyse,
-                     summarise = Summarise)
+                     summarise = Summarise,
+                     parallel = TRUE)
 
-write.csv(res, "Simulation_1")
+write.csv(res, "Simulation_2")

@@ -11,8 +11,8 @@ goric_preference <- function(goric_obj, true_hypothesis, cutoff = "regular") {
   }
   
   if (cutoff =="unusual") {
-    # cut off with 0.75 weight
-    if (max(weights) >= 0.75) {
+    # cut off with 0.95 weight
+    if (max(weights) >= 0.95) {
       selected <- which.max(weights)
     } else {
       selected <- NA  # no decision possible
