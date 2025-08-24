@@ -23,7 +23,7 @@ goric_preference <- function(goric_obj, true_hypothesis, cutoff = "regular") {
   # evaluate selected hypothesis
   
   if (is.na(selected)) {
-    return(1)  # treat as incorrect decision
+    return(0)  # treat as correct decision
   }
   
   if (true_hypothesis == 0) {
