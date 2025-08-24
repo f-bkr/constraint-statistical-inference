@@ -12,18 +12,22 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 ################################################################################
   threshold <- 0.95
   
-  # get all PMPc´s of all hypotheses
-  pmpc <- as.numeric(bain_obj$fit$PMPc)
+  # get all PMPb´s of all hypotheses
+  pmpb <- as.numeric(bain_obj$fit$PMPb)
   
 ################################################################################
 # Give names to hypotheses
 ################################################################################
-  if (is.null(names(bain_obj$fit$PMPc))) {
-    names(pmpc) <- paste0("H", seq_along(pmpc))
-    names(pmpc)[length(pmpc)] <- "Hc"  # last one is complement
+  if (is.null(names(bain_obj$fit$PMPb))) {
+    names(pmpb) <- paste0("H", seq_along(pmpb))
+    names(pmpb)[length(pmpb)] <- "Hc"  # last one is complement, second to last is unconstraint
   } else {
-    names(pmpc) <- names(bain_obj$fit$PMPc)
+    names(pmpb) <- names(bain_obj$fit$PMPb)
   }
+  
+  # find indices of Hu and Hc explicitly
+  hu_index <- which(names(pmpb) == "Hu")
+  hc_index <- which(names(pmpb) == "Hc")
 
 ################################################################################
 # Matching the hypotheses names to their index
@@ -31,32 +35,24 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 
   if (is.character(true_hypothesis)) { #if hypothesis is a character
     # give true index index of where true_hypothesis matches the name of a PMPc
-    true_index <- match(true_hypothesis, names(pmpc))
+    true_index <- match(true_hypothesis, names(pmpb))
     if (is.na(true_index)) {
       stop("true_hypothesis (character) not found in PMP names")
     }
   }
   else if (is.numeric(true_hypothesis)) {
-    if (true_hypothesis %in% c(0, 1)) { #if hypothesis is numeric, which it is
-      # last is complement
-      if (true_hypothesis == 1) {
-## !!!!!!!!!!!!!!! ##
-        # All indices except last (complement) count as "true", since bain makes
-        # two hypotheses out of one(!), might not be useful when generalizing!
-        true_index <- seq_len(length(pmpc) - 1)
-      } else {
-        # Complement is last
-        true_index <- length(pmpc)
-      }
+    if (true_hypothesis == 0) {
+      # H0 true → unconstrained (Hu)
+      true_index <- hu_index
+    } else if (true_hypothesis == 1) {
+      # H1 true → all constrained hypotheses (exclude Hu and Hc)
+      true_index <- setdiff(seq_along(pmpb), c(hu_index, hc_index))
     } else {
-      true_index <- as.integer(true_hypothesis)
-      if (true_index < 1 || true_index > length(pmpc)) {
-        stop("true_hypothesis index out of range")
-      }
+      stop("true_hypothesis must be 0 (Hu) or 1 (constraints)")
     }
-  }
-  else { #if hypothesis is neither character nor numeric raise error
-    stop("true_hypothesis must be numeric (0/1 or index) or char. (name: H0)")
+  } 
+  else {
+    stop("true_hypothesis must be numeric (0/1) or character (name)")
   }
   
 ################################################################################
@@ -65,12 +61,12 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
   
   if (cutoff == "regular") {
     # select most supported
-    selected <- which.max(pmpc)
+    selected <- which.max(pmpb)
   } else if (cutoff == "unusual") {
     # select based on cutoff value
-    combined_pmp <- sum(pmpc[true_index], na.rm=TRUE) #bain splits hypothesis
+    combined_pmp <- sum(pmpb[true_index], na.rm=TRUE) #bain splits hypothesis
     if (combined_pmp >= threshold) {
-      selected <- which.max(pmpc) #select after passing the threshold
+      selected <- which.max(pmpb) #select after passing the threshold
     } else {
       selected <- NA
     }
@@ -82,7 +78,7 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 # Decision making
 ################################################################################
     # No decision = incorrect
-  if (is.na(selected)) return(1)
+  if (is.na(selected)) return(0)
     # Correct if selected matches true_index
   if (selected %in% true_index) {
     return(0)  # correct decision
@@ -92,6 +88,9 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
   
   
 }
+
+
+
 
 ###############################################################################
 bain_preference_old <- function(bain_obj, true_hypothesis){
