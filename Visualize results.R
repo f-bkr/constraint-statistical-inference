@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # Read data
-df <- read.csv("Simulation_1")
+df <- read.csv("Simulation_2")
 
 # Keep only relevant columns
 df_clean <- df %>%
