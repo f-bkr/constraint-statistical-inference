@@ -12,22 +12,22 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 ################################################################################
   threshold <- 0.95
   
-  # get all PMPb´s of all hypotheses
-  pmpb <- as.numeric(bain_obj$fit$PMPb)
+  # get all pmpc´s of all hypotheses
+  pmpc <- as.numeric(bain_obj$fit$PMPc)
   
 ################################################################################
 # Give names to hypotheses
 ################################################################################
-  if (is.null(names(bain_obj$fit$PMPb))) {
-    names(pmpb) <- paste0("H", seq_along(pmpb))
-    names(pmpb)[length(pmpb)] <- "Hc"  # last one is complement, second to last is unconstraint
+  if (is.null(names(bain_obj$fit$PMPc))) {
+    names(pmpc) <- paste0("H", seq_along(pmpc))
+    names(pmpc)[length(pmpc)] <- "Hc"  # last one is complement, second to last is unconstraint
   } else {
-    names(pmpb) <- names(bain_obj$fit$PMPb)
+    names(pmpc) <- names(bain_obj$fit$PMPc)
   }
   
   # find indices of Hu and Hc explicitly
-  hu_index <- which(names(pmpb) == "Hu")
-  hc_index <- which(names(pmpb) == "Hc")
+  hu_index <- which(names(pmpc) == "Hu")
+  hc_index <- which(names(pmpc) == "Hc")
 
 ################################################################################
 # Matching the hypotheses names to their index
@@ -35,7 +35,7 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 
   if (is.character(true_hypothesis)) { #if hypothesis is a character
     # give true index index of where true_hypothesis matches the name of a PMPc
-    true_index <- match(true_hypothesis, names(pmpb))
+    true_index <- match(true_hypothesis, names(pmpc))
     if (is.na(true_index)) {
       stop("true_hypothesis (character) not found in PMP names")
     }
@@ -43,10 +43,10 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
   else if (is.numeric(true_hypothesis)) {
     if (true_hypothesis == 0) {
       # H0 true → unconstrained (Hu)
-      true_index <- hu_index
+      true_index <- hc_index
     } else if (true_hypothesis == 1) {
       # H1 true → all constrained hypotheses (exclude Hu and Hc)
-      true_index <- setdiff(seq_along(pmpb), c(hu_index, hc_index))
+      true_index <- setdiff(seq_along(pmpc), c(hu_index, hc_index))
     } else {
       stop("true_hypothesis must be 0 (Hu) or 1 (constraints)")
     }
@@ -61,12 +61,12 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
   
   if (cutoff == "regular") {
     # select most supported
-    selected <- which.max(pmpb)
+    selected <- which.max(pmpc)
   } else if (cutoff == "unusual") {
     # select based on cutoff value
-    combined_pmp <- sum(pmpb[true_index], na.rm=TRUE) #bain splits hypothesis
+    combined_pmp <- sum(pmpc[true_index], na.rm=TRUE) #bain splits hypothesis
     if (combined_pmp >= threshold) {
-      selected <- which.max(pmpb) #select after passing the threshold
+      selected <- which.max(pmpc) #select after passing the threshold
     } else {
       selected <- NA
     }
@@ -78,7 +78,7 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 # Decision making
 ################################################################################
     # No decision = incorrect
-  if (is.na(selected)) return(0)
+  if (is.na(selected)) return(1)
     # Correct if selected matches true_index
   if (selected %in% true_index) {
     return(0)  # correct decision
