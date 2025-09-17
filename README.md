@@ -1,12 +1,6 @@
 ﻿# constraint-statistical-inference
 
-# Abstract
-In this thesis different ways of testing hypotheses are presented and discussed. In multiple simulation stud-
-ies it is shown how different sample sizes, effect sizes, decision thresholds and parameter restrictions may
-impact the type I and type II error rates of the statistical tests.
+# Welcome!
+This is the github page to my masters thesis "Integrating the generalized order restricted information criterion into the EffectLiteR framework: A simulation study on power gain"
 
-# To-Do
-- integrate thresholds in bain and goric preference functions
-
-- zyklomatische Komplexität
 
