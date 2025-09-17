@@ -34,6 +34,7 @@ generateData <- function(N, hypothesis=0, small.effect=0){
     if (hypothesis == 1){
       # Directional / informative hypothesis: treatments differ
       if (small.effect == 0){
+        # biggest effect
         z <- 1 + 0.5*k + 0.3*Ix1 + 0.4*Ix2 + rnorm(N,0,2)
       
         b0 <- (0.1+0.8*z)                                       
@@ -43,12 +44,26 @@ generateData <- function(N, hypothesis=0, small.effect=0){
         y <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N,0,0.7)
       }
       if (small.effect==1){
+        # medium effect
+        z  <- 1 + 0.30*k + 0.20*Ix1 + 0.24*Ix2 + rnorm(N, 0, 2.25)
+        
+        ## reduced coefficients
+        b0 <- 0.10 + 0.50*z
+        b1 <- 0.16 + 0.3*k + 0.13*z
+        b2 <- 0.16 + 0.3*k + 0.13*z + 0.18*k*z 
+        
+        ## outcome (more residual noise to shrink d)
+        y  <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N, 0, 1.3)
+        
+      }
+      if (small.effect==2){
+        #smallest effect
         z  <- 1 + 0.20*k + 0.10*Ix1 + 0.12*Ix2 + rnorm(N, 0, 2.5)
         
         ## reduced coefficients
         b0 <- 0.10 + 0.30*z
         b1 <- 0.08 + 0.15*k + 0.08*z
-        b2 <- 0.10 + 0.18*k + 0.08*z + 0.08*k*z  # weak interaction
+        b2 <- 0.08 + 0.18*k + 0.08*z + 0.08*k*z  # weak interaction
         
         ## outcome (more residual noise to shrink d)
         y  <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N, 0, 1.6)
@@ -62,8 +77,8 @@ generateData <- function(N, hypothesis=0, small.effect=0){
       b1 <- 0
       b2 <- 0
       
-      z <- 0.5 + 0.05*k + rnorm(N, 0, 1)
-      y <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N, 0, 1.75)
+      z <- 0.5 + 0.05*k + rnorm(N, 0, 2)
+      y <- b0 + b1*Ix1 + b2*Ix2 + rnorm(N, 0, 0.1)
     }
   })
 
@@ -72,7 +87,10 @@ generateData <- function(N, hypothesis=0, small.effect=0){
 }
 
 
-#-----------------------------------------------------------------------------------------------------------------------------
+
+###-----------------------------------------------------------------------------
+# Alternative data generation (not used in the study)
+###-----------------------------------------------------------------------------
 generateData2 <- function(N = 100, hypothesis = 0) {
   # Check for valid hypothesis input
   if (!hypothesis %in% c(0, 1)) {

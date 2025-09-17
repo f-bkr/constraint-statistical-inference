@@ -1,7 +1,7 @@
 library(tidyverse)
 
 # Read data
-df <- read.csv("Simulation_2")
+df <- res #read.csv("Simulation_2")
 
 # Keep only relevant columns
 df_clean <- df %>%
@@ -36,10 +36,10 @@ ggplot(df_long, aes(x = factor(N), y = EDR,
   stat_summary(fun = mean, geom = "line", size = 1) +
   stat_summary(fun = mean, geom = "point", size = 2) +
   facet_grid(true_hypothesis ~ cutoff) +
-  labs(title = "Empirical Discovery Rates across Methods",
+  labs(title = "Error Rates across Methods",
        subtitle = "Faceted by true hypothesis and cutoff type",
        x = "Sample Size (N)",
-       y = "EDR",
+       y = "Error rate",
        color = "Method",
-       linetype = "Effect Size (0=big, 1=small)") +
+       linetype = "Effect Size (0=big, 1=medium, 2=small)") +
   theme_minimal(base_size = 14)

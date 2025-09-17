@@ -1,9 +1,13 @@
 ###-----------------------------------------------------------------------------
 # simdesign: Simulation study
 ###-----------------------------------------------------------------------------
+### library ####
+library(EffectLiteR)
+library(restriktor)
+library(bain)
+library(tidyverse)
 library(SimDesign)
 
-source("Master Skript.R")
 source("Data Generation.R")
 source("elr_function.R")
 source("EDR_function.R")
@@ -18,7 +22,7 @@ source("p_value_decision function.R")
 Design <- createDesign(
   N = c(24, 60, 120, 240, 480, 960),
   true_hypothesis = c(0, 1),
-  small.effect = c(0, 1),
+  small.effect = c(0, 1, 2),
   cutoff = c("regular", "unusual"),
   hypothesis = "adjmean0 < adjmean1; adjmean1 < adjmean2"
 )
@@ -63,7 +67,8 @@ Analyse <- function(condition, dat, fixed_objects) {
   VCOV_AdjMeans <- elrmod@results@vcov.def[parnames,parnames]
   gorica_AdjMeans <- goric(est_AdjMeans, 
                            VCOV=VCOV_AdjMeans, 
-                           hypotheses=list(H1=condition$hypothesis))
+                           hypotheses=list(H1=condition$hypothesis),
+                           comparison = "unconstrained")
   
   goric_decision <- goric_preference(gorica_AdjMeans, condition$true_hypothesis)
   
@@ -114,4 +119,15 @@ res <- runSimulation(design = Design,
                      summarise = Summarise,
                      parallel = TRUE)
 
-write.csv(res, "Simulation_2")
+# write.csv(res, "Simulation_1_new")
+
+
+
+
+###-----------------------------------------------------------------------------
+# Results
+
+# 1 was with cutoff 0.75
+# 2 was with cutoff 0.95
+# 3 was with no decision treated as correct and 0.95 cutoff
+# 4 was with BAIN using PMPb and cutoff 0.95 and no decision as correct

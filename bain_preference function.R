@@ -10,7 +10,7 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 ################################################################################
 # General settings
 ################################################################################
-  threshold <- 0.95
+  threshold <- 0.75
   
   # get all pmpc´s of all hypotheses
   pmpc <- as.numeric(bain_obj$fit$PMPc)
@@ -92,7 +92,10 @@ bain_preference <- function(bain_obj, true_hypothesis, cutoff="regular"){
 
 
 
-###############################################################################
+
+################################################################################
+# Old version of this function
+################################################################################
 bain_preference_old <- function(bain_obj, true_hypothesis){
   # catch some errors I encountered with bain objects
   if (is.null(bain_obj) || is.null(bain_obj$fit) || length(bain_obj$fit$PMPc) == 0) {

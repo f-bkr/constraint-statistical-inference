@@ -9,7 +9,7 @@ source("EDR_function.R")
 source("goric_preference function.R")
 #----------------------------------------------------------------------------
 
-data <- generateData(N=600, hypothesis=1, small.effect = 0)
+data <- generateData(N=600, hypothesis=0, small.effect = 0)
 
 elrmod <- effectLite(
   data = data,
@@ -33,23 +33,21 @@ VCOV_AdjMeans <- elrmod@results@vcov.def[parnames,parnames]
 hypothesis = "adjmean0 <  adjmean1; adjmean1 < adjmean2"
 hypothesis2 = "adjmean0 < adjmean1 < adjmean2"
 
-effectLite_iht(constraints = "adjmean0 < adjmean1 < adjmean2",
+effectLite_iht(constraints = hypothesis,
                test=,
                object=elrmod)
 
 
 test <- bain(x = est_AdjMeans,
      hypothesis = hypothesis,
-     n = 24,
+     n = 600,
      Sigma = list(VCOV_AdjMeans),
      group_parameters = 3, joint_parameters = 0)
 
 test
 
-bain_function(est_AdjMeans = est_AdjMeans, n=24, hypothesis = hypothesis, VCOV_AdjMeans = VCOV_AdjMeans)
-
-bain_preference(test, true_hypothesis = 1, cutoff = "unusual")
-bain_preference_old(test, true_hypothesis = 1)
+bain_preference(test, true_hypothesis = 0, cutoff = "unusual")
+bain_preference_old(test, true_hypothesis = 0)
 
 
 test_g <- goric(est_AdjMeans, VCOV=VCOV_AdjMeans, hypotheses=list(H1=hypothesis))
@@ -89,10 +87,13 @@ mean(a[, "p_nhst"]  == 1, na.rm = TRUE)
 
 #------------------------------------------------------------------------------
 # effect sizes
+library(effsize)
 
 dat <- generateData(N=9999996, hypothesis = 1, small.effect = 0)
-dat_small <- generateData(N=9999996, hypothesis = 1, small.effect = 1)
+dat_small <- generateData(N=9999996, hypothesis = 1, small.effect = 2)
+dat_med <- generateData(N=9999996, hypothesis = 1, small.effect = 1)
 
+#biggest effect
 dat_x0 <- dat[dat$x == 0, ]
 dat_x1 <- dat[dat$x == 1, ]
 dat_x2 <- dat[dat$x == 2, ]
@@ -104,15 +105,28 @@ cohen.d(dat_x1$y, dat_x0$y)
 #d estimate: 0.5547329 (medium)
 
 
+# smallest effect
 dat_small_x0 <- dat_small[dat_small$x==0, ]
 dat_small_x1 <- dat_small[dat_small$x==1, ]
 dat_small_x2 <- dat_small[dat_small$x==2, ]
 
 cohen.d(dat_small_x2$y, dat_small_x0$y)
-#d estimate: 0.6658335 (medium)
+#d estimate: 0.1919368 (negligible)
 
 cohen.d(dat_small_x1$y, dat_small_x0$y)
-#d estimate: 0.348134 (small)
+#d estimate: 0.1540075 (negligible)
+
+
+# medium effect
+dat_med_x0 <- dat_med[dat_med$x==0, ]
+dat_med_x1 <- dat_med[dat_med$x==1, ]
+dat_med_x2 <- dat_med[dat_med$x==2, ]
+
+cohen.d(dat_med_x2$y, dat_med_x0$y)
+# 0.3868241 (small)
+
+cohen.d(dat_med_x1$y, dat_med_x0$y)
+# d estimate: 0.3196365 (small)
 
 #-----------------------------------------------------------------------------
 # aus mayer 2016 supplements:
